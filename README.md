@@ -46,6 +46,21 @@ https://umiyomi.github.io/tri_demensional_star_chart/ar/
 
 `docs/index.html` にスタンドアロン HTML（Plotly 同梱）が出力されます。
 
+## 2D 星座図（PNG）
+
+天球上の見かけの配置（RA/Dec）で伝統的な星座図を白黒 PNG 出力します。
+
+```bash
+.venv/bin/python script/constellation_2d.py
+.venv/bin/python script/constellation_2d.py --no-labels
+```
+
+| オプション | 説明 |
+|-----------|------|
+| （デフォルト） | 星名ラベルあり |
+| `--no-labels` | 星と結線のみ |
+| `-o PATH` | 出力先（既定: `output/virgo_constellation.png`） |
+
 ## GitHub Pages で公開する
 
 1. `docs/index.html` をコミットして `main` に push
