@@ -157,7 +157,7 @@ def build_updatemenus(df, camera, star_trace_index):
             showactive=False,
             buttons=[
                 dict(
-                    label="2D Virgo view",
+                    label="reset camera",
                     method="relayout",
                     args=[{"scene.camera": camera}],
                 ),
