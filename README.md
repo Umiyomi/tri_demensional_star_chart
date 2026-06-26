@@ -4,11 +4,11 @@
 
 ## Viewer
 
-GitHub Pages で公開したインタラクティブ viewer:
+GitHub Pages:
 
-`https://<GitHubユーザー名>.github.io/tri_dimensional_star_chart/`
+https://umiyomi.github.io/tri_demensional_star_chart/
 
-例: `https://umiyomi.github.io/tri_dimensional_star_chart/`
+リポジトリ: https://github.com/Umiyomi/tri_demensional_star_chart
 
 ## ローカルで開く
 
