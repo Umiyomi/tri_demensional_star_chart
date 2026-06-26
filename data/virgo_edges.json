@@ -1,11 +1,11 @@
 [
-  ["Zavijava", "Porrima"],
+  ["Zavijava", "Zaniah"],
   ["Porrima", "Minelauva"],
   ["Minelauva", "Vindemiatrix"],
   ["Porrima", "Zaniah"],
-  ["Minelauva", "Heze"],
-  ["Heze", "Spica"],
-  ["Porrima", "Syrma"],
+  ["Porrima", "Heze"],
+  ["Porrima", "Spica"],
+  ["Heze", "Syrma"],
   ["Syrma", "Kang"],
   ["Kang", "Khambalia"],
   ["Khambalia", "Elgafar"]
