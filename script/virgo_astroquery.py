@@ -21,7 +21,8 @@ VIRGO_STARS = [
     "Syrma",        # ι Vir
     "Kang",         # κ Vir
     "Khambalia",    # λ Vir
-    "Elgafar"       # φ Vir
+    "Elgafar",       # φ Vir
+    "tau Vir",      # τ Vir
 ]
 
 
