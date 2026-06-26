@@ -241,7 +241,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    df = pd.read_csv(stars_path)
+    df = pd.read_csv(stars_path, comment="#")
     df = add_cartesian_coords(df)
 
     if args.html is not None:
