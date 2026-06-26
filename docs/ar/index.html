@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Virgo AR Star Chart</title>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js@3.4.7/aframe/build/aframe-ar.js"></script>
+  <style>
+  html, body {
+    margin: 0;
+    overflow: hidden;
+    font-family: system-ui, sans-serif;
+  }
+  #hint {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    text-align: center;
+    font-size: 0.95rem;
+    z-index: 10;
+    pointer-events: none;
+  }
+  #hint.hidden {
+    display: none;
+  }
+  #error {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 0.75rem;
+    background: #8b0000;
+    color: #fff;
+    text-align: center;
+    font-size: 0.9rem;
+    z-index: 11;
+    display: none;
+  }
+  </style>
+</head>
+<body>
+  <div id="error"></div>
+  <div id="hint">Hiro マーカーをカメラに映してください</div>
+
+  <a-scene
+    embedded
+    vr-mode-ui="enabled: false"
+    renderer="logarithmicDepthBuffer: true; precision: medium;"
+    arjs="sourceType: webcam; debugUIEnabled: false;"
+  >
+    <a-marker preset="hiro" id="marker" emitevents="true">
+      <a-entity id="constellation"></a-entity>
+    </a-marker>
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <script>
+  const STAR_RADIUS = 0.008;
+  const EARTH_RADIUS = 0.012;
+  const LINE_RADIUS = 0.0015;
+  const STAR_COLOR = "#fff8dc";
+
+  function showError(message) {
+    const el = document.getElementById("error");
+    el.textContent = message;
+    el.style.display = "block";
+  }
+
+  function addStar(parent, star) {
+    const sphere = document.createElement("a-sphere");
+    sphere.setAttribute("position", `${star.x} ${star.y} ${star.z}`);
+    sphere.setAttribute("radius", STAR_RADIUS);
+    sphere.setAttribute("color", STAR_COLOR);
+    sphere.setAttribute("material", "shader: flat");
+    parent.appendChild(sphere);
+  }
+
+  function addEarth(parent) {
+    const sphere = document.createElement("a-sphere");
+    sphere.setAttribute("position", "0 0 0");
+    sphere.setAttribute("radius", EARTH_RADIUS);
+    sphere.setAttribute("color", "#2ecc71");
+    sphere.setAttribute("material", "shader: flat");
+    parent.appendChild(sphere);
+  }
+
+  function addLine(parent, edge) {
+    const ax = edge.ax, ay = edge.ay, az = edge.az;
+    const bx = edge.bx, by = edge.by, bz = edge.bz;
+    const dx = bx - ax, dy = by - ay, dz = bz - az;
+    const length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    if (length < 1e-6) return;
+
+    const mx = (ax + bx) / 2;
+    const my = (ay + by) / 2;
+    const mz = (az + bz) / 2;
+
+    const cylinder = document.createElement("a-cylinder");
+    cylinder.setAttribute("position", `${mx} ${my} ${mz}`);
+    cylinder.setAttribute("height", length);
+    cylinder.setAttribute("radius", LINE_RADIUS);
+    cylinder.setAttribute("color", "#9696ff");
+    cylinder.setAttribute("material", "shader: flat; opacity: 0.85; transparent: true");
+    parent.appendChild(cylinder);
+
+    const up = new THREE.Vector3(0, 1, 0);
+    const dir = new THREE.Vector3(dx, dy, dz).normalize();
+    const quat = new THREE.Quaternion().setFromUnitVectors(up, dir);
+    cylinder.object3D.quaternion.copy(quat);
+  }
+
+  function buildConstellation(data) {
+    const root = document.getElementById("constellation");
+    while (root.firstChild) root.removeChild(root.firstChild);
+
+    addEarth(root);
+    for (const star of data.stars) addStar(root, star);
+    for (const edge of data.edges) addLine(root, edge);
+  }
+
+  async function init() {
+    try {
+      const response = await fetch("virgo.json");
+      if (!response.ok) throw new Error(`virgo.json (${response.status})`);
+      const data = await response.json();
+      buildConstellation(data);
+    } catch (err) {
+      showError(`データの読み込みに失敗しました: ${err.message}`);
+    }
+
+    const marker = document.getElementById("marker");
+    const hint = document.getElementById("hint");
+    marker.addEventListener("markerFound", () => hint.classList.add("hidden"));
+    marker.addEventListener("markerLost", () => hint.classList.remove("hidden"));
+  }
+
+  window.addEventListener("load", init);
+  </script>
+</body>
+</html>
