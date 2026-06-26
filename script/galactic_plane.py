@@ -52,6 +52,25 @@ def plot_galactic_plane_antique(df, output_path=None):
         marker="o"
     )
 
+    for _, row in df.iterrows():
+        ax.annotate(
+            row["name"],
+            (row["x_pc"], row["y_pc"]),
+            textcoords="offset points",
+            xytext=(-4, 4),
+            fontsize=8,
+            color="black",
+        )
+
+    ax.annotate(
+        "Sun",
+        (0, 0),
+        textcoords="offset points",
+        xytext=(4, 4),
+        fontsize=8,
+        color="black",
+    )
+
     # 軸の線を“地図風”に
     for spine in ax.spines.values():
         spine.set_linewidth(0.8)
@@ -82,5 +101,5 @@ def plot_galactic_plane_antique(df, output_path=None):
     plt.show()
     
 if __name__ == "__main__":
-    df = pd.read_csv("./data/virgo_stars.csv")
+    df = pd.read_csv("./data/virgo_stars.csv", comment="#")
     plot_galactic_plane_antique(df, output_path="./output/galactic_plane_antique.png") 
