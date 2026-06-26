@@ -166,7 +166,7 @@ def build_updatemenus(df, camera, star_trace_index):
     ]
 
 
-def plot_virgo_3d_plotly(df, edges_path="./data/virgo_edges.json"):
+def build_virgo_figure(df, edges_path="./data/virgo_edges.json"):
     edges = load_edges(edges_path)
     camera = compute_virgo_camera(df)
     fig = go.Figure()
@@ -192,6 +192,7 @@ def plot_virgo_3d_plotly(df, edges_path="./data/virgo_edges.json"):
     ))
 
     fig.update_layout(
+        title="Virgo 3D Star Chart",
         updatemenus=build_updatemenus(df, camera, star_trace_index),
         scene=dict(
             xaxis_title="X (pc)",
@@ -200,13 +201,52 @@ def plot_virgo_3d_plotly(df, edges_path="./data/virgo_edges.json"):
             camera=camera,
         ),
     )
+    return fig
 
+
+def export_virgo_html(output_path, df, edges_path="./data/virgo_edges.json"):
+    fig = build_virgo_figure(df, edges_path=edges_path)
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.write_html(
+        output_path,
+        include_plotlyjs=True,
+        full_html=True,
+        post_script=build_camera_dampening_script(),
+    )
+    return output_path
+
+
+def plot_virgo_3d_plotly(df, edges_path="./data/virgo_edges.json"):
+    fig = build_virgo_figure(df, edges_path=edges_path)
     fig.show(post_script=build_camera_dampening_script())
 
 
 if __name__ == "__main__":
+    import argparse
+
     project_root = Path(__file__).resolve().parent.parent
-    df = pd.read_csv(project_root / "data" / "virgo_stars.csv")
+    stars_path = project_root / "data" / "virgo_stars.csv"
+    edges_path = project_root / "data" / "virgo_edges.json"
+    default_html_path = project_root / "docs" / "index.html"
+
+    parser = argparse.ArgumentParser(description="Virgo 3D star chart")
+    parser.add_argument(
+        "--html",
+        nargs="?",
+        const=default_html_path,
+        default=None,
+        type=Path,
+        help=f"export standalone HTML (default: {default_html_path})",
+    )
+    args = parser.parse_args()
+
+    df = pd.read_csv(stars_path)
     df = add_cartesian_coords(df)
-    print(df.head())
-    plot_virgo_3d_plotly(df, edges_path=project_root / "data" / "virgo_edges.json")
+
+    if args.html is not None:
+        output_path = export_virgo_html(args.html, df, edges_path=edges_path)
+        print(f"Wrote: {output_path}")
+    else:
+        print(df.head())
+        plot_virgo_3d_plotly(df, edges_path=edges_path)
